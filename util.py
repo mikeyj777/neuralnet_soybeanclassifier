@@ -52,24 +52,17 @@ def y2indicator(y):
     K = len(set(y))
     ind = np.zeros((N, K))
     for i in range(N):
-        ind[i, y[i]] = 1
+        ind[i, int(y[i])] = 1
+    ind = ind.astype(int)
     return ind
 
 
-def getData(balance_ones=True):
+def getData(balance_ones=False):
     # images are 48x48 = 2304 size vectors
-    Y = []
-    X = []
-    first = True
-    for line in open('data/fer2013.csv'):
-        if first:
-            first = False
-        else:
-            row = line.split(',')
-            Y.append(int(row[0]))
-            X.append([int(p) for p in row[1].split()])
+    X = np.genfromtxt('data/X.csv', delimiter=',')
+    X = np.array(X) / 255.0
 
-    X, Y = np.array(X) / 255.0, np.array(Y)
+    Y = np.genfromtxt('data/Y.csv', delimiter=',')
 
     if balance_ones:
         # balance the 1 class

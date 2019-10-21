@@ -1,11 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
+from random import random
 
-import os
-
-
-from util import getData, softmax, cost2, y2indicator, error_rate, relu
+from importdata import getbeandata
+from util import getData, softmax, cost, cost2, y2indicator, error_rate, relu
 
 from sklearn.utils import shuffle
 
@@ -55,7 +54,7 @@ class ANN(object):
 
             if i % 20 == 0:
                 pYvalid, _ = self.forward(Xvalid)
-                c = cost2(Yvalid, pYvalid)
+                c = cost(Yvalid, pYvalid)
                 costs.append(c)
                 e = error_rate(Yvalid, np.argmax(pYvalid, axis=1))
 
@@ -92,17 +91,37 @@ def main():
 
     print("now:  ", t0)
 
-    X, Y = getData()
+    squareside = 4
 
-    dt = datetime.now() - t0
+    X, Y, picclasses = getbeandata(squareside)
 
-    print("dt:  ", dt)
+    picindextoclass = {}
+
+    for picclass in picclasses.keys():
+        picindextoclass[picclasses[picclass]] = picclass
 
     M = 10  # hidden units
 
     model = ANN(M)
-    model.fit(X, Y, show_fig=True)
-    print(model.score(X, Y))
+    model.fit(X, Y, show_fig=True, epochs=10)
+    print('model score: ', model.score(X, Y))
+
+    forhomework = []
+    hwanswers = []
+    choice = random.randint(0, X.shape[0] - 1)
+    forhomework.append(X[choice])
+    hwanswers.append(Y[choice])
+    while X[choice] in forhomework:
+        choice = random.randint(0, X.shape[0] - 1)
+    forhomework.append(X[choice])
+    hwanswers.append(Y[choice])
+
+    forhomework = np.asarray(forhomework)
+
+    hwpredictions = model.predict(forhomework)
+
+    for pred, ans in zip(hwpredictions, hwanswers):
+        print('predicted ', pred, ' and was actually ', ans)
 
 
 if __name__ == '__main__':
